@@ -16,6 +16,7 @@ const bodyParser = require('body-parser');
 // Cors is a middleware which allows cross-origin requests
 const cors = require('cors');
 const seedRouter = require('./api/routes/seedRoute');
+const { errorResponse } = require('./api/helpers/responseHandler');
 
 
 const rateLimiter = rateLimit({
@@ -62,10 +63,7 @@ app.use((req, res, next) => {
 
 // Server Error Handling Middleware
 app.use((error, req, res, next) => {
-    res.status(error.status || 500).json({
-        success: false,
-        error: error.message || 'Internal Server Error',
-    });
+    return errorResponse(res, { statusCode: error.status, message: error.message });
 });
 
 

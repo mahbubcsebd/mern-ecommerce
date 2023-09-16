@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const createError = require('http-errors');
+const { successResponse } = require('../helpers/responseHandler');
 
 const getAllUsersHandler = async (req, res) => {
     try {
@@ -45,17 +46,20 @@ const getAllUsersHandler = async (req, res) => {
         //  If no user found
         if(!users) throw createError(404, 'Users not found');
 
-        res.status(200).json({
-        message: 'All users',
-        users,
-        pagination: {
-            currentPage: page,
-            previousPage: page > 1 ? page - 1 : null,
-            nextPage: page < Math.ceil(count / limit) ? page + 1 : null,
-            currentItems: users.length,
-            totalPages: Math.ceil(count / limit),
-            totalItems: count,
-        },
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'All users',
+            payload: {
+                users,
+                pagination: {
+                    currentPage: page,
+                    previousPage: page > 1 ? page - 1 : null,
+                    nextPage: page < Math.ceil(count / limit) ? page + 1 : null,
+                    currentItems: users.length,
+                    totalPages: Math.ceil(count / limit),
+                    totalItems: count,
+                },
+            },
     });
     } catch (error) {
         res.status(500).json({
