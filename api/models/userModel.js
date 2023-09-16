@@ -1,5 +1,7 @@
 const {Schema, model} = require('mongoose');
 const { defaultImagePath } = require('../../secrete');
+const bcrypt = require('bcryptjs');
+const validate = require('validator');
 
 const userSchema = new Schema({
     name: {
@@ -51,7 +53,7 @@ const userSchema = new Schema({
         type: Boolean,
         default: false,
     },
-}{timestamps: true});
+},{timestamps: true});
 
 
 const User = model('User', userSchema);

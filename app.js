@@ -1,7 +1,9 @@
 const express = require('express');
 const app = express();
 const rateLimit = require('express-rate-limit');
-const userRoute = require('./api/routes/users.route');
+const userRoute = require('./api/routes/userRoute');
+const seedRoute = require('./api/routes/seedRoute');
+// const seedRouter = require('./api/routes/seed.route');
 
 
 // http-errors is a middleware which creates an error object
@@ -13,6 +15,7 @@ const bodyParser = require('body-parser');
 // Rate Limiter  is a middleware which limits the number of requests a client can make
 // Cors is a middleware which allows cross-origin requests
 const cors = require('cors');
+const seedRouter = require('./api/routes/seedRoute');
 
 
 const rateLimiter = rateLimit({
@@ -43,6 +46,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/users', userRoute);
+app.use('/api/seed', seedRoute);
 
 
 
