@@ -4,10 +4,12 @@ const { successResponse, errorResponse } = require('../helpers/responseHandler')
 const createHttpError = require("http-errors");
 const { findItemById } = require("../services/findItem");
 const deleteImage = require("../helpers/deleteImage");
+const { createJsonWebToken } = require("../helpers/jsonWebToken");
+const { jwtRegKey } = require("../../secrete");
 
 
 // Get all users with pagination and search
-const getAllUsersController = async (req, res) => {
+const getAllUsersController = async (req, res, next) => {
     try {
 
         // For Search
@@ -75,7 +77,7 @@ const getAllUsersController = async (req, res) => {
 
 
 // Get a user by id
-const getUserController = async (req, res) => {
+const getUserController = async (req, res, next) => {
     try {
         const id = req.params.id;
 
@@ -144,8 +146,55 @@ const deleteUserController = async (req, res, next) => {
     }
 };
 
+
+
+// Register a user
+const registerUserController = async (req, res, next) => {
+    try {
+        const { name, email, password, phone, address } = req.body;
+        // Check if the user already exists
+        const userExist = await User.exists({ email: email });
+        if (userExist) {
+            return next(
+                createHttpError(409, 'User already exists. Please Sign In')
+            );
+        }
+
+        // Create JWT token
+        const token = createJsonWebToken(
+            { name, email, password, phone, address },
+            jwtRegKey,
+            "10m"
+        );
+
+
+
+        // Create a new user
+        const newUser = new User({
+            name,
+            email,
+            password,
+            phone,
+            address,
+            token,
+        });
+
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'User created successfully',
+            payload: { newUser, token },
+        });
+    } catch (error) {
+        return errorResponse(res, {
+            statusCode: error.status,
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     getAllUsersController,
     getUserController,
     deleteUserController,
+    registerUserController,
 };
