@@ -3,7 +3,7 @@ const createError = require('http-errors');
 const { successResponse, errorResponse } = require('../helpers/responseHandler');
 const createHttpError = require("http-errors");
 const { findItemById } = require("../services/findItem");
-const fs = require('fs');
+const deleteImage = require("../helpers/deleteImage");
 
 
 // Get all users with pagination and search
@@ -123,20 +123,10 @@ const deleteUserController = async (req, res, next) => {
         }
 
         // For delete user using image
-        const imagePath = user.image;
-        fs.access(imagePath, (error) => {
-            if (error) {
-                console.error('User Image does not exist');
-            } else {
-                fs.unlink(imagePath, (error) => {
-                    if (error) {
-                        throw error;
-                    } else {
-                        console.log('User Image removed successfully');
-                    }
-                });
-            }
-        });
+        const userImagePath = user.image;
+        deleteImage(userImagePath);
+
+
 
         // Delete a user except admin
         const deletedUser = await User.findByIdAndDelete(id, options);
