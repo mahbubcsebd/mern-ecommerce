@@ -1,18 +1,18 @@
 const express = require('express');
-const { getAllUsersHandler } = require('../controllers/userController');
+const {
+    getAllUsersController,
+    getUserController,
+    deleteUserController,
+} = require('../controllers/userController');
 const router = express.Router();
 
 
 
 // Get all users
-router.get('/', getAllUsersHandler);
+router.get('/', getAllUsersController);
 
 // Get a user by id
-router.get('/:id', (req, res) => {
-    res.status(200).json({
-        message: 'Get a user by id',
-    });
-});
+router.get('/:id', getUserController);
 
 // Create a user
 router.post('/', (req, res) => {
@@ -29,11 +29,7 @@ router.put('/:id', (req, res) => {
 });
 
 // Delete a user
-router.delete('/:id', (req, res) => {
-    res.status(200).json({
-        message: 'Delete a user',
-    });
-});
+router.delete('/:id', deleteUserController);
 
 
 module.exports = router;

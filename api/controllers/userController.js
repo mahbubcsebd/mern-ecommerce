@@ -1,8 +1,13 @@
 const User = require("../models/userModel");
 const createError = require('http-errors');
-const { successResponse } = require('../helpers/responseHandler');
+const { successResponse, errorResponse } = require('../helpers/responseHandler');
+const createHttpError = require("http-errors");
+const { findItemById } = require("../services/findItem");
+const fs = require('fs');
 
-const getAllUsersHandler = async (req, res) => {
+
+// Get all users with pagination and search
+const getAllUsersController = async (req, res) => {
     try {
 
         // For Search
@@ -48,7 +53,7 @@ const getAllUsersHandler = async (req, res) => {
 
         return successResponse(res, {
             statusCode: 200,
-            message: 'All users',
+            message: 'Get all users successfully',
             payload: {
                 users,
                 pagination: {
@@ -60,7 +65,7 @@ const getAllUsersHandler = async (req, res) => {
                     totalItems: count,
                 },
             },
-    });
+        });
     } catch (error) {
         res.status(500).json({
             message: 'Internal server error from getAllUsersHandler',
@@ -68,4 +73,89 @@ const getAllUsersHandler = async (req, res) => {
     }
 };
 
-module.exports = {  getAllUsersHandler }
+
+// Get a user by id
+const getUserController = async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        // We don't want to show password
+        const options = {
+            projection: { password: 0 },
+        };
+
+        const user = await findItemById(User, id, options);
+
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'Get a user by Id successfully',
+            payload: { user },
+        });
+    } catch (error) {
+        return errorResponse(res, {
+            statusCode: error.status,
+            message: error.message,
+        });
+    }
+};
+
+
+// Delete a user by id
+const deleteUserController = async (req, res, next) => {
+    try {
+        const id = req.params.id;
+
+        const options = {
+            projection: { password: 0 },
+        };
+
+        // Fetch user details
+        const user = await findItemById(User, id);
+
+        // Check if the user exists
+        if (!user) {
+            return next(createHttpError(404, 'User not exist by this id'));
+        }
+
+        // Check if the user is an admin and prevent deletion if true
+        if (user.isAdmin) {
+            return next(createHttpError(403, 'Admin user cannot be deleted'));
+        }
+
+        // For delete user using image
+        const imagePath = user.image;
+        fs.access(imagePath, (error) => {
+            if (error) {
+                console.error('User Image does not exist');
+            } else {
+                fs.unlink(imagePath, (error) => {
+                    if (error) {
+                        throw error;
+                    } else {
+                        console.log('User Image removed successfully');
+                    }
+                });
+            }
+        });
+
+        // Delete a user except admin
+        const deletedUser = await User.findByIdAndDelete(id, options);
+
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'User deleted successfully',
+            payload: { deletedUser },
+        });
+    } catch (error) {
+        return errorResponse(res, {
+            statusCode: error.status,
+            message: error.message,
+        });
+    }
+};
+
+module.exports = {
+    getAllUsersController,
+    getUserController,
+    deleteUserController,
+};
