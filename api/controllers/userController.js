@@ -5,7 +5,9 @@ const createHttpError = require("http-errors");
 const { findItemById } = require("../services/findItem");
 const deleteImage = require("../helpers/deleteImage");
 const { createJsonWebToken } = require("../helpers/jsonWebToken");
-const { jwtRegKey } = require("../../secrete");
+const { jwtRegKey, smtpUserName, clientUrl } = require("../../secrete");
+const sendEmail = require("../helpers/email");
+const jwt = require('jsonwebtoken');
 
 
 // Get all users with pagination and search
@@ -167,23 +169,85 @@ const registerUserController = async (req, res, next) => {
             "10m"
         );
 
+        // Prepare Email
+        const emailData = {
+            from: smtpUserName,
+            to: email,
+            subject: 'Account Activation Email',
+            html: `
+                <h2>Hello ${name} !</h2>
+                <p>Please <a href="${clientUrl}/api/users/activate/${token} target="_blank">click here</a> to activate your account</p>
+            `,
+        };
 
 
-        // Create a new user
-        const newUser = new User({
-            name,
-            email,
-            password,
-            phone,
-            address,
-            token,
-        });
+        // Send Email with Node mailer
+        try {
+            await sendEmail(emailData);
+        } catch (error) {
+            throw createHttpError(500, 'Email sent failed');
+        }
 
         return successResponse(res, {
             statusCode: 200,
-            message: 'User created successfully',
-            payload: { newUser, token },
+            message: `Please check your email:${email} to activate your account`,
+            payload: { token },
         });
+    } catch (error) {
+        return errorResponse(res, {
+            statusCode: error.status,
+            message: error.message,
+        });
+    }
+};
+
+
+// Activate a user
+const activateUserController = async (req, res, next) => {
+    try {
+        const token = req.body.token;
+
+        // Check if the token is valid
+        if (!token) {
+            return next(createHttpError(400, 'Token not found'));
+        }
+
+        try {
+            // Verify the token
+            const decoded = jwt.verify(token, jwtRegKey);
+
+            if (!decoded) {
+                return next(
+                    createHttpError(400, 'User was not able to register')
+                );
+            };
+
+            // Check if the user already exists
+            const userExist = await User.exists({ email: decoded.payload.email });
+            if (userExist) {
+                return next(
+                    createHttpError(409, 'User already exists. Please Sign In')
+                );
+            };
+
+            await User.create(decoded.payload);
+
+
+        return successResponse(res, {
+            statusCode: 201,
+            message: `User registered successfully`,
+            payload: {},
+        });
+
+        } catch (error) {
+            if (error.name === 'TokenExpiredError') {
+                return next(createHttpError(400, 'Token expired'));
+            } else if (error.name === 'JsonWebTokenError') {
+                return next(createHttpError(400, 'Invalid Token'));
+            } else {
+                return next(createHttpError(500, 'Internal server error'));
+            }
+        }
     } catch (error) {
         return errorResponse(res, {
             statusCode: error.status,
@@ -197,4 +261,5 @@ module.exports = {
     getUserController,
     deleteUserController,
     registerUserController,
+    activateUserController,
 };
