@@ -154,6 +154,12 @@ const deleteUserController = async (req, res, next) => {
 const registerUserController = async (req, res, next) => {
     try {
         const { name, email, password, phone, address } = req.body;
+
+        const imageBufferString = req.file.buffer.toString('base64');
+
+        if (!imageBufferString) {
+            return next(createHttpError(400, 'Image is required'));
+        }
         // Check if the user already exists
         const userExist = await User.exists({ email: email });
         if (userExist) {
@@ -164,7 +170,7 @@ const registerUserController = async (req, res, next) => {
 
         // Create JWT token
         const token = createJsonWebToken(
-            { name, email, password, phone, address },
+            { name, email, password, phone, address, imageBufferString },
             jwtRegKey,
             "10m"
         );

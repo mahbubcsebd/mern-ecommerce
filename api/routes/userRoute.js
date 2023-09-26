@@ -13,7 +13,13 @@ const router = express.Router();
 
 
 // Register a user
-router.post('/register', registerValidation, runValidation, upload.single("image"), registerUserController);
+router.post(
+    '/register',
+    upload.single('image'),
+    registerValidation,
+    runValidation,
+    registerUserController
+);
 // Verify user account
 router.post('/verify', activateUserController);
 // Get all users
