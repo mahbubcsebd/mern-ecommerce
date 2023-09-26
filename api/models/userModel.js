@@ -34,8 +34,8 @@ const userSchema = new Schema({
         },
     },
     image: {
-        type: String,
-        default: defaultImagePath,
+        type: Buffer,
+        contentType: String,
     },
     address: {
         type: String,

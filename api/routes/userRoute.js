@@ -6,11 +6,14 @@ const {
     registerUserController,
     activateUserController,
 } = require('../controllers/userController');
+const upload = require('../middlewares/uploadFile');
+const { registerValidation } = require('../validators/auth');
+const { runValidation } = require('../validators');
 const router = express.Router();
 
 
 // Register a user
-router.post('/register', registerUserController);
+router.post('/register', registerValidation, runValidation, upload.single("image"), registerUserController);
 // Verify user account
 router.post('/verify', activateUserController);
 // Get all users
