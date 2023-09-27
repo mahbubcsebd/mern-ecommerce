@@ -13,7 +13,6 @@ const jwt = require('jsonwebtoken');
 // Get all users with pagination and search
 const getAllUsersController = async (req, res, next) => {
     try {
-
         // For Search
         const search = req.query.search || '';
 
@@ -339,6 +338,90 @@ const activateUserController = async (req, res, next) => {
     }
 };
 
+// Ban a user
+const banUserController = async (req, res, next) => {
+    try {
+        const userId = req.params.id;
+
+        const options = {new: true};
+
+        // Check if the user exists
+        const user = await findItemById(User, userId, options);
+
+
+        const updates = {
+            isBanned: true,
+        };
+
+        updateOptions = {
+            new: true,
+            runValidators: true,
+            context: 'query',
+        };
+
+        const bannedUser = await User.findByIdAndUpdate(
+            userId,
+            updates,
+            updateOptions
+        ).select('-password');
+
+
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'user banned successfully',
+            payload: { bannedUser },
+        });
+    } catch (error) {
+        return errorResponse(res, {
+            statusCode: error.status,
+            message: error.message,
+        });
+    }
+};
+
+
+// Ban a user
+const unBanUserController = async (req, res, next) => {
+    try {
+        const userId = req.params.id;
+
+        const options = {new: true};
+
+        // Check if the user exists
+        const user = await findItemById(User, userId, options);
+
+
+        const updates = {
+            isBanned: false,
+        };
+
+        updateOptions = {
+            new: true,
+            runValidators: true,
+            context: 'query',
+        };
+
+
+        const bannedUser = await User.findByIdAndUpdate(
+            userId,
+            updates,
+            updateOptions
+        ).select('-password');
+
+
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'user unbanned successfully',
+            payload: { bannedUser },
+        });
+    } catch (error) {
+        return errorResponse(res, {
+            statusCode: error.status,
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     getAllUsersController,
     getUserController,
@@ -346,4 +429,6 @@ module.exports = {
     registerUserController,
     activateUserController,
     updateUserController,
+    banUserController,
+    unBanUserController,
 };

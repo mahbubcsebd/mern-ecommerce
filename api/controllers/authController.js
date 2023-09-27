@@ -23,10 +23,10 @@ const loginController = async (req, res, next) => {
         if (user.isBanned) throw createHttpError(400, 'You are banned. Please contact with admin');
 
         // Generate token
-        const accessToken = createJsonWebToken({ email }, jwtAccessKey, '10m');
+        const accessToken = createJsonWebToken({ user }, jwtAccessKey, '15m');
 
         // Set cookie
-        res.cookie('access_token', accessToken, {
+        res.cookie('accessToken', accessToken, {
             httpOnly: true,
             maxAge: 15 * 60 * 1000, // 15 minutes
             secure: true,
@@ -35,7 +35,7 @@ const loginController = async (req, res, next) => {
 
         return successResponse(res, {
             statusCode: 200,
-            message: "Login Successful",
+            message: "Login Successfully",
             payload: { },
         });
     } catch (error) {
@@ -50,11 +50,11 @@ const loginController = async (req, res, next) => {
 const logoutController = async (req, res, next) => {
     try {
         // Clear cookie
-        res.clearCookie('access_token');
+        res.clearCookie('accessToken');
 
         return successResponse(res, {
             statusCode: 200,
-            message: 'Logout Successful',
+            message: 'Logout Successfully',
             payload: {},
         });
     } catch (error) {

@@ -5,11 +5,13 @@ const {
     loginController,
     logoutController,
 } = require('../controllers/authController');
+const { loginValidation } = require('../validators/authValidators');
+const { isLoggedOut, isLoggedIn } = require('../middlewares/auth');
 
 
 
-authRouter.post('/login', loginController);
-authRouter.post('/logout', logoutController);
+authRouter.post('/login', loginValidation, runValidation, isLoggedOut, loginController);
+authRouter.post('/logout', isLoggedIn, logoutController);
 
 
 

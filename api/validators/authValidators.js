@@ -46,6 +46,21 @@ const registerValidation = [
     //     .withMessage('Image is required'),
 ];
 
+const loginValidation = [
+    body('email')
+        .trim()
+        .notEmpty()
+        .withMessage('Email is required')
+        .isEmail()
+        .withMessage('Email must be valid'),
+
+    body('password')
+        .trim()
+        .notEmpty()
+        .withMessage('Please enter your password')
+]
+
 module.exports = {
-    registerValidation
+    registerValidation,
+    loginValidation,
 };

@@ -6,10 +6,13 @@ const {
     registerUserController,
     activateUserController,
     updateUserController,
+    banUserController,
+    unBanUserController,
 } = require('../controllers/userController');
 const upload = require('../middlewares/uploadFile');
-const { registerValidation } = require('../validators/auth');
+const { registerValidation } = require('../validators/authValidators');
 const { runValidation } = require('../validators');
+const { isLoggedIn, isLoggedOut, isAdmin } = require('../middlewares/auth');
 const userRouter = express.Router();
 
 
@@ -17,24 +20,29 @@ const userRouter = express.Router();
 userRouter.post(
     '/register',
     upload.single('image'),
+    isLoggedOut,
     registerValidation,
     runValidation,
     registerUserController
 );
 // Verify user account
-userRouter.post('/verify', activateUserController);
+userRouter.post('/verify', isLoggedOut, activateUserController);
 // Get all users
-userRouter.get('/', getAllUsersController);
+userRouter.get('/', isLoggedIn, isAdmin, getAllUsersController);
 // Get a single user by id
-userRouter.get('/:id', getUserController);
+userRouter.get('/:id', isLoggedIn, isAdmin, getUserController);
 // Update a user
-userRouter.put('/:id', upload.single('image'), updateUserController);
+userRouter.put('/:id', upload.single('image'), isLoggedIn, updateUserController);
+// Ban a user
+userRouter.put('/ban/:id', isLoggedIn, isAdmin, banUserController);
+// Ban a user
+userRouter.put('/unban/:id', isLoggedIn, isAdmin, unBanUserController);
 
 
 
 
 // Delete a user
-userRouter.delete('/:id', deleteUserController);
+userRouter.delete('/:id', isLoggedIn, deleteUserController);
 
 
 module.exports = userRouter;
