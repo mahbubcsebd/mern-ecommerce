@@ -1,9 +1,9 @@
 const express = require('express');
-const router = express.Router();
+const seedRouter = express.Router();
 
 const { seedController } = require('../controllers/seedcontroller');
 
-router.post('/', seedController);
+seedRouter.post('/', seedController);
 
 
-module.exports = router;
+module.exports = seedRouter;

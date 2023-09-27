@@ -1,9 +1,10 @@
 const express = require('express');
 const app = express();
 const rateLimit = require('express-rate-limit');
-const userRoute = require('./api/routes/userRoute');
-const seedRoute = require('./api/routes/seedRoute');
-// const seedRouter = require('./api/routes/seed.route');
+const seedRouter = require('./api/routes/seedRouter');
+const userRouter = require('./api/routes/userRouter');
+const authRouter = require('./api/routes/authRouter');
+
 
 
 // http-errors is a middleware which creates an error object
@@ -15,8 +16,8 @@ const bodyParser = require('body-parser');
 // Rate Limiter  is a middleware which limits the number of requests a client can make
 // Cors is a middleware which allows cross-origin requests
 const cors = require('cors');
-const seedRouter = require('./api/routes/seedRoute');
 const { errorResponse } = require('./api/helpers/responseHandler');
+const cookieParser = require('cookie-parser');
 
 
 const rateLimiter = rateLimit({
@@ -24,9 +25,6 @@ const rateLimiter = rateLimit({
     max: 50, // limit each IP to 50 requests per windowMs
     message: 'Too many requests from this IP, please try again after 15 minutes',
 });
-
-
-
 
 
 // Middlewares
@@ -38,6 +36,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(rateLimiter);
+app.use(cookieParser());
 
 
 app.get('/', (req, res) => {
@@ -46,19 +45,15 @@ app.get('/', (req, res) => {
     });
 });
 
-app.use('/api/users', userRoute);
-app.use('/api/seed', seedRoute);
-
-
-
+app.use('/api/seed', seedRouter);
+app.use('/api/users', userRouter);
+app.use('/api/auth', authRouter);
 
 
 // Client Error Handling Middleware
 app.use((req, res, next) => {
     next(createError(404, '404 Not Found'));
 });
-
-
 
 
 // Server Error Handling Middleware

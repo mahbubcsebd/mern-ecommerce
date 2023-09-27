@@ -114,7 +114,7 @@ const deleteUserController = async (req, res, next) => {
         };
 
         // Fetch user details
-        const user = await findItemById(User, id);
+        const user = await findItemById(User, id, options);
 
         // Check if the user exists
         if (!user) {
@@ -149,17 +149,94 @@ const deleteUserController = async (req, res, next) => {
 };
 
 
+// Update a user by id
+const updateUserController = async (req, res, next) => {
+    try {
+        const userId = req.params.id;
+
+        const updateOptions = {
+            new: true,
+            runValidators: true,
+            context: 'query',
+        };
+
+        let updates = {};
+
+
+        for (let key in req.body) {
+            if (['name', 'password', 'phone', 'address'].includes(key)) {
+                updates[key] = req.body[key];
+            }
+
+            else if (['email'].includes(key)) {
+                throw createHttpError(400, 'Email cannot be updated');
+            }
+        }
+
+        if (req.file) {
+            const userImage = req.file;
+            const imageBufferString = userImage.buffer.toString('base64');
+
+            if (!userImage) {
+                return next(createHttpError(400, 'Image is required'));
+            }
+
+            if (userImage.size > 1024 * 1024 * 2) {
+                return next(
+                    createHttpError(400, 'Image should be less than 2MB')
+                );
+            } // 2MB
+
+            updates.image = imageBufferString;
+        }
+
+        // Check if the user exists
+        const user = await findItemById(User, userId, updateOptions);
+
+        if (!user) {
+            return next(createHttpError(404, 'User not exist by this id'));
+        }
+
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            updates,
+            updateOptions
+        ).select('-password');
+
+        if(!updatedUser) throw createError(404, 'User not found');
+
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'User updated successfully',
+            payload: { updatedUser },
+        });
+    } catch (error) {
+        return errorResponse(res, {
+            statusCode: error.status,
+            message: error.message,
+        });
+    }
+};
+
+
 
 // Register a user
 const registerUserController = async (req, res, next) => {
     try {
         const { name, email, password, phone, address } = req.body;
 
-        const imageBufferString = req.file.buffer.toString('base64');
+        const userImage = req.file;
+        const imageBufferString = userImage.buffer.toString('base64');
 
-        if (!imageBufferString) {
-            return next(createHttpError(400, 'Image is required'));
-        }
+        // if (!userImage) {
+        //     return next(createHttpError(400, 'Image is required'));
+        // }
+
+        if(userImage.size > 1024 * 1024 * 2) {
+            return next(createHttpError(400, 'Image should be less than 2MB'));
+        } // 2MB
+
         // Check if the user already exists
         const userExist = await User.exists({ email: email });
         if (userExist) {
@@ -268,4 +345,5 @@ module.exports = {
     deleteUserController,
     registerUserController,
     activateUserController,
+    updateUserController,
 };

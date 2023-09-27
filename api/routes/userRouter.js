@@ -5,15 +5,16 @@ const {
     deleteUserController,
     registerUserController,
     activateUserController,
+    updateUserController,
 } = require('../controllers/userController');
 const upload = require('../middlewares/uploadFile');
 const { registerValidation } = require('../validators/auth');
 const { runValidation } = require('../validators');
-const router = express.Router();
+const userRouter = express.Router();
 
 
 // Register a user
-router.post(
+userRouter.post(
     '/register',
     upload.single('image'),
     registerValidation,
@@ -21,17 +22,19 @@ router.post(
     registerUserController
 );
 // Verify user account
-router.post('/verify', activateUserController);
+userRouter.post('/verify', activateUserController);
 // Get all users
-router.get('/', getAllUsersController);
+userRouter.get('/', getAllUsersController);
 // Get a single user by id
-router.get('/:id', getUserController);
+userRouter.get('/:id', getUserController);
+// Update a user
+userRouter.put('/:id', upload.single('image'), updateUserController);
 
 
 
 
 // Delete a user
-router.delete('/:id', deleteUserController);
+userRouter.delete('/:id', deleteUserController);
 
 
-module.exports = router;
+module.exports = userRouter;
