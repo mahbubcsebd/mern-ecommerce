@@ -3,7 +3,7 @@ const data = {
         {
             name: 'Mahbubur Rahman',
             email: 'mahbub.cse.me@gmail.com',
-            password: '12345678',
+            password: 'Admin@123',
             address: 'Dhaka',
             phone: '01700000000',
             image: 'dummy.jpg',
@@ -11,7 +11,7 @@ const data = {
         {
             name: 'Afroza Afrin Liza',
             email: 'liza.cse.me@gmail.com',
-            password: '12345678',
+            password: 'Admin@123',
             address: 'Dhaka',
             phone: '01700000000',
             image: 'dummy.jpg',
@@ -19,7 +19,7 @@ const data = {
         {
             name: 'Nazmul Hasan',
             email: 'nazmul.cse.me@gmail.com',
-            password: '12345678',
+            password: 'Admin@123',
             address: 'Dhaka',
             phone: '01700000000',
             image: 'dummy.jpg',
@@ -27,7 +27,7 @@ const data = {
         {
             name: 'Abul Kalam Azad',
             email: 'abul.cse.me@gmail.com',
-            password: '12345678',
+            password: 'Admin@123',
             address: 'Dhaka',
             phone: '01700000000',
             image: 'dummy.jpg',
@@ -35,7 +35,7 @@ const data = {
         {
             name: 'Babul Mia',
             email: 'babul.cse.me@gmail.com',
-            password: '12345678',
+            password: 'Admin@123',
             address: 'Dhaka',
             phone: '01700000000',
             image: 'dummy.jpg',
@@ -43,7 +43,7 @@ const data = {
         {
             name: 'Camelia Akter',
             email: 'cemelia.cse.me@gmail.com',
-            password: '12345678',
+            password: 'Admin@123',
             address: 'Dhaka',
             phone: '01700000000',
             image: 'dummy.jpg',
@@ -51,14 +51,14 @@ const data = {
         {
             name: 'Dipu Biswas',
             email: 'dipu.cse.me@gmail.com',
-            password: '12345678',
+            password: 'Admin@123',
             address: 'Dhaka',
             phone: '01700000000',
         },
         {
             name: 'Emon Khan',
             email: 'emon.cse.me@gmail.com',
-            password: '12345678',
+            password: 'Admin@123',
             address: 'Dhaka',
             phone: '01700000000',
             image: 'dummy.jpg',
@@ -66,7 +66,7 @@ const data = {
         {
             name: 'Farzana Akter',
             email: 'farzana.cse.me@gmail.com',
-            password: '12345678',
+            password: 'Admin@123',
             address: 'Dhaka',
             phone: '01700000000',
             image: 'dummy.jpg',
@@ -74,7 +74,7 @@ const data = {
         {
             name: 'Golam Rabbani',
             email: 'rabbani.cse.me@gmail.com',
-            password: '12345678',
+            password: 'Admin@123',
             address: 'Dhaka',
             phone: '01700000000',
             image: 'dummy.jpg',
@@ -82,7 +82,7 @@ const data = {
         {
             name: 'Habibur Rahman',
             email: 'habib.cse.me@gmail.com',
-            password: '12345678',
+            password: 'Admin@123',
             address: 'Dhaka',
             phone: '01700000000',
             image: 'dummy.jpg',

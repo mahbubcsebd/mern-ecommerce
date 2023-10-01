@@ -2,7 +2,8 @@ const createHttpError = require('http-errors');
 const jwt = require('jsonwebtoken');
 const { jwtAccessKey } = require('../../secrete');
 
-const isLoggedIn = (req, res, next) => {
+const
+isLoggedIn = (req, res, next) => {
     try {
         const accessToken = req.cookies.accessToken;
         if (!accessToken) throw createHttpError(401, 'You are not logged in');

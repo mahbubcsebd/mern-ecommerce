@@ -8,9 +8,10 @@ const {
     updateUserController,
     banUserController,
     unBanUserController,
+    updatePasswordController,
 } = require('../controllers/userController');
 const upload = require('../middlewares/uploadFile');
-const { registerValidation } = require('../validators/authValidators');
+const { registerValidation, updatePasswordValidation } = require('../validators/authValidators');
 const { runValidation } = require('../validators');
 const { isLoggedIn, isLoggedOut, isAdmin } = require('../middlewares/auth');
 const userRouter = express.Router();
@@ -37,6 +38,8 @@ userRouter.put('/:id', upload.single('image'), isLoggedIn, updateUserController)
 userRouter.put('/ban/:id', isLoggedIn, isAdmin, banUserController);
 // Ban a user
 userRouter.put('/unban/:id', isLoggedIn, isAdmin, unBanUserController);
+// Update Password
+userRouter.put('/update-password/:id', isLoggedIn, updatePasswordValidation, updatePasswordController);
 
 
 

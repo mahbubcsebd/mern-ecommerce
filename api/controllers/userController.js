@@ -8,6 +8,7 @@ const { createJsonWebToken } = require("../helpers/jsonWebToken");
 const { jwtRegKey, smtpUserName, clientUrl } = require("../../secrete");
 const sendEmail = require("../helpers/email");
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 
 // Get all users with pagination and search
@@ -422,6 +423,64 @@ const unBanUserController = async (req, res, next) => {
     }
 };
 
+
+// Update Password
+const updatePasswordController = async (req, res, next) => {
+    try {
+        const userId = req.params.id;
+        const { oldPassword, newPassword, confirmPassword } = req.body;
+
+        const options = {
+            projection: { password: 0 },
+        };
+
+        // Check if the user exists
+        const user = await findItemById(User, userId, options);
+
+        // Check if password is correct
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch)
+            throw createHttpError(
+                401,
+                'Old Password does not match. Please try again'
+            );
+
+        // Check if new password and confirm password are same
+        if (newPassword !== confirmPassword){
+            throw createHttpError(401, 'Confirm Password does not match');
+        }
+
+        if (oldPassword === newPassword){
+            throw createHttpError(401, 'Old Password and New Password cannot be same');
+        }
+
+        const filter = { _id: userId };
+        const updates = { password: newPassword };
+        const updateOptions = { new: true };
+
+        const updatedUser = await User.findOneAndUpdate(
+            filter,
+            updates,
+            updateOptions
+        ).select('-password');
+
+
+
+
+
+        return successResponse(res, {
+            statusCode: 200,
+            message: 'password update successfully',
+            payload: { updatedUser },
+        });
+    } catch (error) {
+        return errorResponse(res, {
+            statusCode: error.status,
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     getAllUsersController,
     getUserController,
@@ -431,4 +490,5 @@ module.exports = {
     updateUserController,
     banUserController,
     unBanUserController,
+    updatePasswordController,
 };
