@@ -36,14 +36,14 @@ const registerValidation = [
         .withMessage('Phone is required')
         .isMobilePhone()
         .withMessage('Phone must be valid'),
-    // body('image')
-    //     .custom((value, { req }) => {
-    //         if (!req.file) {
-    //             throw new Error('Image is required');
-    //         }
-    //         return true;
-    //     })
-    //     .withMessage('Image is required'),
+    body('image')
+        .custom((value, { req }) => {
+            if (!req.file) {
+                throw new Error('Image is required');
+            }
+            return true;
+        })
+        .withMessage('Image is required'),
 ];
 
 const loginValidation = [
@@ -92,7 +92,7 @@ const updatePasswordValidation = [
             throw new Error('Confirm password does not match');
         }
         return true;
-    }
+    })
 ];
 
 module.exports = {
